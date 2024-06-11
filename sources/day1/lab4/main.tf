@@ -4,10 +4,6 @@ terraform {
       source  = "hashicorp/aws"
       version = "~> 5.0"
     }
-    random = {
-      source  = "hashicorp/random"
-      version = "~> 3.0"
-    }
   }
 }
 
@@ -119,4 +115,8 @@ resource "aws_eip" "my_eip" {
 
 output "public_ip" {
   value = aws_eip.my_eip.address
+}
+
+output "subnet_id" {
+  value = aws_subnet.my_subnet.id
 }
