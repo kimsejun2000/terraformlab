@@ -1,9 +1,14 @@
 #!/bin/bash
 
 # Wordpress 초기화
-yum update -y
-yum install -y httpd24 php70 php70-mysqlnd
-chkconfig httpd on
+apt update -y
+apt install -y apache2 php php-curl php-gd php-mbstring php-xml php-xmlrpc libapache2-mod-php php-mysql php-fpm php-json php-cgi php-soap php-intl php-zip
+sed -i -e '169a\\<Directory /var/www/html/>' /etc/apache2/apache2.conf
+sed -i -e '170a\\    AllowOverride All' /etc/apache2/apache2.conf
+sed -i -e '171a\\</Directory>' /etc/apache2/apache2.conf
+sed -i -e '172a\\' /etc/apache2/apache2.conf
+a2enmod rewrite
+apache2ctl configtest
 
 # Wordpress 다운로드 및 설정
 cd /tmp
@@ -23,19 +28,17 @@ sed -i -e '88a\\define("DOMAIN_CURRENT_SITE", filter_input(INPUT_SERVER, "HTTP_H
 sed -i -e '89a\\' /tmp/wordpress/wp-config.php
 sed -i -e '90a\\' /tmp/wordpress/wp-config.php
 
-sed 's/database_name_here/<RDS Database name>/g' /tmp/wordpress/wp-config.php
-sed 's/username_here/<RDS Username>/g' /tmp/wordpress/wp-config.php
-sed 's/password_here/<RDS Password>/g' /tmp/wordpress/wp-config.php
-sed 's/localhost/<RDS Endpoint>/g' /tmp/wordpress/wp-config.php
+sed -i -e 's/database_name_here/<RDS Database name>/g' /tmp/wordpress/wp-config.php
+sed -i -e 's/username_here/<RDS Username>/g' /tmp/wordpress/wp-config.php
+sed -i -e 's/password_here/<RDS Password>/g' /tmp/wordpress/wp-config.php
+sed -i -e 's/localhost/<RDS Endpoint>/g' /tmp/wordpress/wp-config.php
 
 # Wordpress 복사
 rm -rf /var/www/html
 sudo cp -a /tmp/wordpress/. /var/www/html
 
-# Wordpress 권한 수정
-usermod -a -G apache ec2-user
-chown -R ec2-user:apache /var/www
-chmod 2775 /var/www
-find /var/www -type d -exec sudo chmod 2775 {} \;
-find /var/www -type f -exec sudo chmod 0664 {} \;
-service httpd start
+chown -R www-data:www-data /var/www/html
+chmod -R g+w /var/www/html
+
+# Apache service restart
+service apache2 restart
