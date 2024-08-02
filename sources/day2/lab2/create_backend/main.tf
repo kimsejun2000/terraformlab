@@ -29,13 +29,13 @@ variable "profile" {
 }
 
 variable "bucket_id" {
-  description = "The ID of the bucket"
+    description = "The ID of the bucket"
 }
 
 resource "random_string" "tail_string" {
-  length  = 6
-  upper   = false
-  special = false
+  length    = 6
+  upper     = false
+  special   = false
 }
 
 locals {
@@ -43,7 +43,17 @@ locals {
 }
 
 resource "aws_s3_bucket" "my_bucket" {
-  bucket = local.bucket_name
+    bucket = local.bucket_name
+}
+
+resource "aws_dynamodb_table" "my_table" {
+  name           = local.bucket_name
+  billing_mode   = "PAY_PER_REQUEST"
+  hash_key       = "id"
+  attribute {
+    name = "id"
+    type = "S"
+  }
 }
 
 output "my_bucket_name" {

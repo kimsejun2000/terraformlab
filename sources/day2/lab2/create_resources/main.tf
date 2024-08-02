@@ -1,3 +1,12 @@
+terraform {
+  backend "s3" {
+    bucket = "sejun00y1y4az"
+    key    = "terraform/wordpress.tfstate"
+    region = "ap-northeast-2"
+    profile = "sejun"
+  }
+}
+
 provider "aws" {
   region = var.region
   profile = var.profile

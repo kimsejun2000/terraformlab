@@ -1,11 +1,52 @@
+terraform {
+  cloud {
+    organization = "ahnlabcm-lab02"
+    hostname = "app.terraform.io"
+
+    workspaces {
+      tags = ["kimsejun"]
+    }
+  }
+}
+
 provider "aws" {
-  region = "ap-northeast-2"
+  region = var.region
+  access_key = var.access_key
+  secret_key = var.secret_key
+  token = var.token
+}
+
+variable "region" {
+  type        = string
+  default     = "ap-northeast-2"
+  description = "Base Region"
+}
+
+variable "access_key" {
+  type        = string
+  description = "iam user's access key"
+}
+
+variable "secret_key" {
+  type        = string
+  description = "iam user's secret key"
+}
+
+variable "token" {
+  type        = string
+  description = "temporary access token"
+}
+
+variable "name" {
+  type    = string
+  default = "sejun"
+  description = "Base on resource names"
 }
 
 module "common" {
   source = "./module/common"
 
-  tag_name = "sejun_common"
+  name = "${var.name}_common"
 }
 
 variable "rds_password" {
@@ -16,7 +57,7 @@ variable "rds_password" {
 
 locals {
   resource_tags = {
-    Name = "sejun"
+    Name = var.name
   }
 }
 
@@ -27,7 +68,7 @@ data "aws_iam_policy" "administratoraccess" {
 
 # EC2 instance에 연결할 Role 생성
 resource "aws_iam_role" "ec2_role" {
-  name = "ec2_role_administratoraccess"
+  name = "${var.name}_ec2_role_administratoraccess"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -50,7 +91,7 @@ resource "aws_iam_role" "ec2_role" {
 
 # EC2 instance에 연결할 Role을 이용하여 EX2 profile 생성
 resource "aws_iam_instance_profile" "ec2_profile" {
-  name = "ec2_profile"
+  name = "${var.name}_ec2_profile"
   role = aws_iam_role.ec2_role.name
 
   tags = local.resource_tags
@@ -58,27 +99,27 @@ resource "aws_iam_instance_profile" "ec2_profile" {
 
 # RDS Instance 생성 시 생성될 subnet 지정을 위한 RDS Subnet Group 생성
 resource "aws_db_subnet_group" "my_rds_subnetgroup" {
-  name       = "rds_group"
-  subnet_ids = [module.common.subnet_id,module.common.subnet2_id]
+  name       = "${var.name}_rds_group"
+  subnet_ids = [module.common.subnet_id, module.common.subnet2_id]
 
   tags = local.resource_tags
 }
 
 # mysql 8.0 RDS instance 생성
 resource "aws_db_instance" "my_rds" {
-  identifier           = "sejun-rds"
-  allocated_storage    = 10
-  db_name              = "wordpress"
-  engine               = "mysql"
-  engine_version       = "8.0"
-  instance_class       = "db.t3.micro"
-  availability_zone    = "ap-northeast-2a"
-  username             = "wordpress"
-  password             = var.rds_password
-  parameter_group_name = "default.mysql8.0"
-  db_subnet_group_name = aws_db_subnet_group.my_rds_subnetgroup.name
+  identifier             = "${var.name}-rds"
+  allocated_storage      = 10
+  db_name                = "wordpress"
+  engine                 = "mysql"
+  engine_version         = "8.0"
+  instance_class         = "db.t3.micro"
+  availability_zone      = module.common.first_subnet_az
+  username               = "wordpress"
+  password               = var.rds_password
+  parameter_group_name   = "default.mysql8.0"
+  db_subnet_group_name   = aws_db_subnet_group.my_rds_subnetgroup.name
   vpc_security_group_ids = [module.common.security_group_id]
-  skip_final_snapshot  = true
+  skip_final_snapshot    = true
 
   tags = local.resource_tags
 }
@@ -86,12 +127,12 @@ resource "aws_db_instance" "my_rds" {
 module "instance" {
   source = "./module/create_ec2"
 
-  subnet_id = module.common.subnet_id
+  subnet_id         = module.common.subnet_id
   security_group_id = module.common.security_group_id
-  ec2_profile = aws_iam_instance_profile.ec2_profile.name   # 생성된 EC2 profile 전달
-  rds_instance = aws_db_instance.my_rds                     # 생성된 RDS object 전달
-  rds_password = var.rds_password
-  tag_name = "sejun_instance"
+  ec2_profile       = aws_iam_instance_profile.ec2_profile.name # 생성된 EC2 profile 전달
+  rds_instance      = aws_db_instance.my_rds                    # 생성된 RDS object 전달
+  rds_password      = var.rds_password
+  name              = "${var.name}_instance"
 }
 
 output "instance1_public_ip" {

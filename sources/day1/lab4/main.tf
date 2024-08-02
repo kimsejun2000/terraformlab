@@ -8,12 +8,31 @@ terraform {
 }
 
 provider "aws" {
-    region = "ap-northeast-2"
+  region = var.region
+  profile = var.profile
+}
+
+variable "region" {
+  type        = string
+  default     = "ap-northeast-2"
+  description = "Base Region"
+}
+
+variable "profile" {
+  type        = string
+  default     = "default"
+  description = "Base profile"
+}
+
+variable "name" {
+  type    = string
+  default = "sejun"
+  description = "Base on resource names"
 }
 
 locals {
   resource_tags = {
-    Name = "sejun"
+    Name = var.name
   }
 }
 
@@ -49,7 +68,7 @@ resource "aws_default_route_table" "my_rt" {
 }
 
 resource "aws_security_group" "my_sg" {
-  name        = "my_sg"
+  name        = "${var.name}_sg"
   description = "Allow HTTP and SSH inbound traffic and all outbound traffic"
   vpc_id      = aws_vpc.my_vpc.id
 
@@ -88,7 +107,7 @@ resource "aws_network_interface" "my_eni" {
 }
 
 resource "aws_instance" "my_instance" {
-  ami           = "ami-0edc5427d49d09d2a"
+  ami           = "ami-062cf18d655c0b1e8"
   instance_type = "t2.micro"
 
   network_interface {
@@ -98,8 +117,10 @@ resource "aws_instance" "my_instance" {
 
   user_data = <<-EOF
 #!/bin/bash
-def update –y && def install -y httpd
-systemctl start httpd
+apt update -y
+apt install -y apache2
+service apache2 start
+service apache2 restart
 EOF
 
   tags = local.resource_tags
@@ -113,7 +134,7 @@ resource "aws_eip" "my_eip" {
 }
 
 output "public_ip" {
-  value = aws_eip.my_eip.address
+  value = aws_eip.my_eip.public_ip
 }
 
 output "subnet_id" {
