@@ -18,6 +18,7 @@ provider "azurerm" {
 variable "resource_group_name" {
   type        = string
   description = "The name of the resource group"
+  default     = "lab1-rg"
 }
 
 variable "location" {
@@ -28,6 +29,7 @@ variable "location" {
 
 variable "storage_account_name" {
   description = "The ID of the storage account"
+  default     = "lab1st"
 }
 
 resource "random_string" "tail_string" {
