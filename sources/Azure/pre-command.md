@@ -8,8 +8,14 @@ export ARM_SUBSCRIPTION_ID="<subscription_id>"
 $env:ARM_SUBSCRIPTION_ID = "1e2f8c37-113b-42c2-b03b-d8917ccfbb26"
 ```
 
+git install 
+https://git-scm.com/downloads
+
 Terraform install
 https://developer.hashicorp.com/terraform/install
+
+visuals studio code install
+https://code.visualstudio.com/download
 
 Azure CLI install
 https://learn.microsoft.com/ko-kr/cli/azure/install-azure-cli?view=azure-cli-latest
