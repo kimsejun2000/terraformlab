@@ -2,9 +2,9 @@ provider "azurerm" {
   features {}
 }
 
-module "hub" {
-    source = "./modules/hub"
-}
+# module "hub" {
+#     source = "./modules/hub"
+# }
 
 module "spoke01" {
     source = "./modules/spoke"
@@ -22,6 +22,8 @@ module "spoke01-instance1" {
   name                 = "vm-01"
   username             = var.username
   password             = var.password
+
+  depends_on = [ module.spoke01 ]
 }
 
 module "hub-to-spoke01-peering" {
