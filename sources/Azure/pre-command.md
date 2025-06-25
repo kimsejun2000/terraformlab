@@ -5,7 +5,7 @@ export ARM_SUBSCRIPTION_ID="<subscription_id>"
 ```
 
 ```pwsh
-$env:ARM_SUBSCRIPTION_ID = "1e2f8c37-113b-42c2-b03b-d8917ccfbb26"
+$env:ARM_SUBSCRIPTION_ID = "<subscription_id>"
 ```
 
 git install 
