@@ -32,7 +32,7 @@ resource "azurerm_public_ip" "pip" {
 }
 
 resource "azurerm_bastion_host" "bastion" {
-  name                = "hub-bastion"
+  name                = "${local.name}-bastion"
   location            = local.location
   resource_group_name = azurerm_resource_group.rg.name
 
