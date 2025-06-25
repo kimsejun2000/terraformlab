@@ -11,7 +11,6 @@ variable "location" {
 
 variable "name" {
   type    = string
-  default = "sejun"
   description = "Base resource name"
 }
 
@@ -19,9 +18,6 @@ module "common" {
   source   = "./module/common"
   name     = "${var.name}_common"
   location = var.location
-  providers = {
-    azurerm = azurerm.test
-  }
 }
 
 module "instance1" {
