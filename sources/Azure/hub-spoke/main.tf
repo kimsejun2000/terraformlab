@@ -2,6 +2,7 @@ provider "azurerm" {
   features {}
 }
 
+
 variable "location" {
   type        = string
   default     = "koreacentral"
@@ -31,4 +32,20 @@ module "spoke2" {
   name     = "${var.name}-spoke2"
   location = var.location
   ip_cidr  = "10.2.0.0/16"
+}
+
+module "hubtospoke1" {
+  source   = "./module/peering-hub"
+
+  spoke_name = "${var.name}-spoke1"
+  hub_virtual_network = module.hub.virtual_network
+  spoke_virtual_network = module.spoke1.virtual_network
+}
+
+module "hubtospoke2" {
+  source   = "./module/peering-hub"
+
+  spoke_name = "${var.name}-spoke2"
+  hub_virtual_network = module.hub.virtual_network
+  spoke_virtual_network = module.spoke2.virtual_network
 }

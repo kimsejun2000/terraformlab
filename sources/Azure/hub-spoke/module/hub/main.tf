@@ -9,7 +9,7 @@ terraform {
 
 provider "azurerm" {
   features {}
-  subscription_id = "<hub-subscription-id>"
+  subscription_id = "<hub_subscription_id>"
 }
 
 resource "azurerm_resource_group" "main" {
