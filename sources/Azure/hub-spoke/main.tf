@@ -3,9 +3,9 @@ provider "azurerm" {
 }
 
 provider "azurerm" {
-    alias = "hub"
+  alias = "hub"
   features {}
-  subscription_id = "70cae3b9-cda4-4d2e-ab79-6a354bfe1dc9"
+  subscription_id = "<Hub Subscription ID>"
 }
 
 variable "location" {
