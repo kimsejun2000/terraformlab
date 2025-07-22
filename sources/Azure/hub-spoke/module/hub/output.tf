@@ -10,8 +10,8 @@ output "firewall_subnet" {
   value = azurerm_subnet.firewall_subnet
 }
 
-output "bastion_subnet" {
-  value = azurerm_subnet.bastion_subnet
+output "bastion_ip" {
+  value = azurerm_public_ip.bastion_ip.ip_address
 }
 
 output "virtual_network" {

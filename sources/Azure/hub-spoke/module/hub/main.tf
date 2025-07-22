@@ -9,7 +9,7 @@ terraform {
 
 provider "azurerm" {
   features {}
-  subscription_id = "70cae3b9-cda4-4d2e-ab79-6a354bfe1dc9"
+  subscription_id = "<hub-subscription-id>"
 }
 
 resource "azurerm_resource_group" "main" {
@@ -79,5 +79,25 @@ resource "azurerm_network_security_group" "main" {
     destination_port_range     = "22"
     source_address_prefix      = "*"
     destination_address_prefix = "*"
+  }
+}
+
+resource "azurerm_public_ip" "bastion_ip" {
+  name                = "${local.name}-bastion-ip"
+  location            = azurerm_resource_group.main.location
+  resource_group_name = azurerm_resource_group.main.name
+  allocation_method   = "Static"
+  sku                 = "Standard"
+}
+
+resource "azurerm_bastion_host" "bastion" {
+  name                = "${local.name}-bastion"
+  location            = azurerm_resource_group.main.location
+  resource_group_name = azurerm_resource_group.main.name
+
+  ip_configuration {
+    name                 = "configuration"
+    subnet_id            = azurerm_subnet.bastion_subnet.id
+    public_ip_address_id = azurerm_public_ip.bastion_ip.id
   }
 }

@@ -2,12 +2,6 @@ provider "azurerm" {
   features {}
 }
 
-provider "azurerm" {
-  alias = "hub"
-  features {}
-  subscription_id = "<Hub Subscription ID>"
-}
-
 variable "location" {
   type        = string
   default     = "koreacentral"
@@ -23,4 +17,18 @@ module "hub" {
   source   = "./module/hub"
   name     = var.name
   location = var.location
+}
+
+module "spoke1" {
+  source   = "./module/spoke"
+  name     = "${var.name}-spoke1"
+  location = var.location
+  ip_cidr  = "10.1.0.0/16"
+}
+
+module "spoke2" {
+  source   = "./module/spoke"
+  name     = "${var.name}-spoke2"
+  location = var.location
+  ip_cidr  = "10.2.0.0/16"
 }
