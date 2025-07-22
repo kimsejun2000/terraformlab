@@ -1,0 +1,2 @@
+name = "sejun"
+location = "koreacentral"
